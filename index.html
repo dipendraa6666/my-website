@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0C0C0C">
+<link rel="canonical" href="https://dipendra-adhikari.com.np/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dipendra J. Adhikari">
+<meta property="og:title" content="Dipendra J. Adhikari | Digital creator and marketing strategist">
+<meta property="og:description" content="AI, content strategy and ads to help businesses go viral and hit their sales targets. Based in Dubai.">
+<meta property="og:url" content="https://dipendra-adhikari.com.np/">
+<meta property="og:image" content="https://dipendra-adhikari.com.np/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dipendra-adhikari.com.np/og-image.png">
 <title>Dipendra J. Adhikari | Digital creator and marketing specialist</title>
 <meta name="description" content="Dipendra J. Adhikari is a Dubai-based digital creator and marketing strategist. AI, content strategy and ads to help businesses go viral and hit their sales targets.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000000'/%3E%3Ctext x='32' y='43' font-size='30' font-family='Georgia' font-style='italic' text-anchor='middle' fill='%232A9461'%3EDA%3C/text%3E%3C/svg%3E">
@@ -472,9 +481,8 @@ footer{padding:2rem 0 3rem;color:var(--mist);font-size:.9rem;border-top:1px soli
 <section class="s" id="contact"><div class="wrap">
   <p class="ctat serif rv">Ready to <span class="hl rvh">go viral</span> and hit your <span class="hl rvh">sales target</span>?</p>
   <p class="ctasub">Book a free 30-minute 1:1 strategy call. Pick a date and I will confirm it by email.</p>
-  <form class="book" id="book" name="strategy-call" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-    <input type="hidden" name="form-name" value="strategy-call">
-    <p class="hp"><label>Leave this empty <input name="bot-field"></label></p>
+  <form class="book" id="book" name="strategy-call">
+    <p class="hp"><label>Leave this empty <input name="_honey" tabindex="-1" autocomplete="off"></label></p>
     <label class="f"><span>Your name</span><input name="name" required autocomplete="name"></label>
     <label class="f"><span>Your email</span><input type="email" name="email" required autocomplete="email"></label>
     <label class="f"><span>Preferred date</span><input type="date" name="date" id="bdate" required></label>
@@ -493,6 +501,16 @@ footer{padding:2rem 0 3rem;color:var(--mist);font-size:.9rem;border-top:1px soli
 <script>
 (function(){
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Analytics (optional): paste your IDs between the quotes, then upload the site again. Empty = no tracking.
+  var GA_ID = '', CLARITY_ID = '';
+  if (GA_ID){
+    var gs = document.createElement('script'); gs.async = true; gs.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID; document.head.appendChild(gs);
+    window.dataLayer = window.dataLayer || []; window.gtag = function(){ dataLayer.push(arguments); }; gtag('js', new Date()); gtag('config', GA_ID);
+  }
+  if (CLARITY_ID){
+    (function(c, l, a, r, i, t, y){ c[a] = c[a] || function(){ (c[a].q = c[a].q || []).push(arguments); }; t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, 'clarity', 'script', CLARITY_ID);
+  }
 
   // name letters
   var chars = [], idx = 0;
@@ -622,15 +640,16 @@ footer{padding:2rem 0 3rem;color:var(--mist);font-size:.9rem;border-top:1px soli
     }
   }
 
-  // strategy call form: sends the request straight to the email (Netlify Forms), with an email-app fallback
+  // strategy call form: sends the request straight to the email (through FormSubmit), with an email-app fallback
   var book = document.getElementById('book'), bmsg = document.getElementById('bmsg'), bdate = document.getElementById('bdate');
   var td = new Date(); bdate.min = td.getFullYear() + '-' + ('0' + (td.getMonth() + 1)).slice(-2) + '-' + ('0' + td.getDate()).slice(-2);
   book.addEventListener('submit', function(e){
     e.preventDefault();
     var fd = new FormData(book), nm = fd.get('name'), dt = fd.get('date');
     bmsg.className = 'bmsg'; bmsg.textContent = 'Sending...';
-    fetch('/', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(fd).toString()})
-      .then(function(r){ if (!r.ok) throw new Error('send'); bmsg.className = 'bmsg ok'; bmsg.textContent = 'Thank you, ' + nm + '! I will confirm ' + dt + ' by email.'; book.reset(); })
+    fetch('https://formsubmit.co/ajax/mails.dipendra@gmail.com', {method:'POST', headers:{'Content-Type':'application/json', 'Accept':'application/json'}, body:JSON.stringify({name:nm, email:fd.get('email'), date:dt, _subject:'Free strategy call request for ' + dt, _template:'table', _honey:fd.get('_honey') || ''})})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if (!(d && (d.success === true || d.success === 'true'))) throw new Error('send'); bmsg.className = 'bmsg ok'; bmsg.textContent = 'Thank you, ' + nm + '! I will confirm ' + dt + ' by email.'; book.reset(); })
       .catch(function(){
         bmsg.textContent = 'Opening your email app so you can send the request...';
         location.href = 'mailto:mails.dipendra@gmail.com?subject=' + encodeURIComponent('Free strategy call on ' + dt) + '&body=' + encodeURIComponent('Hi Dipendra,\nI would like to book a free strategy call.\nName: ' + nm + '\nEmail: ' + fd.get('email') + '\nPreferred date: ' + dt);
